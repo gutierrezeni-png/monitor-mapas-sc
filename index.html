@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="refresh" content="300">
+<title>Monitoreo de mapas · Guerrero–Chiapas</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--txt:#1f2328;--sub:#5b6470;--borde:#dde2e8;--azul:#0c447c;
+--ok:#2e7d32;--ok-bg:#e8f5e9;--av:#b26a00;--av-bg:#fff4e0;--mal:#b3261e;--mal-bg:#fdecea;--ambar:#8a5a00;--rojo:#a32d2d;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#14171b;--card:#1d2228;--txt:#e7eaee;--sub:#9aa4b1;--borde:#2f3640;--azul:#7fb3ea;
+--ok:#7bd88a;--ok-bg:#16301b;--av:#f2b75b;--av-bg:#33270f;--mal:#ff8a80;--mal-bg:#3a1714;--ambar:#f2b75b;--rojo:#ff8a80;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{background:var(--azul);color:#fff;padding:14px 18px}
+@media (prefers-color-scheme:dark){header{background:#0f2a47}.pest button.act{color:#0b1b2e}}
+header h1{margin:0;font-size:1.15rem}
+header p{margin:2px 0 0;font-size:.85rem;opacity:.85}
+main{max-width:1150px;margin:0 auto;padding:14px}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:14px}
+.t{background:var(--card);border:1px solid var(--borde);border-radius:12px;padding:12px 14px}
+.t h2{margin:0 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--sub)}
+.t .v{font-size:1.05rem;font-weight:600}
+.t .s{font-size:.85rem;color:var(--sub);margin-top:2px}
+.est{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:.9rem}
+.est.ok{background:var(--ok-bg);color:var(--ok)}.est.av{background:var(--av-bg);color:var(--av)}.est.mal{background:var(--mal-bg);color:var(--mal)}
+.sis{margin:4px 0 0;padding:0;list-style:none;font-size:.9rem}
+.sis li{padding:3px 0;border-top:1px dashed var(--borde)}.sis li:first-child{border-top:0}
+.ciclon{color:var(--rojo);font-weight:600}.zona{color:var(--ambar);font-weight:600}
+.pest{display:flex;gap:6px;margin-bottom:8px}
+.pest button{flex:1;max-width:200px;padding:9px 12px;border:1px solid var(--borde);background:var(--card);color:var(--txt);
+border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+.pest button.act{background:var(--azul);color:#fff;border-color:var(--azul)}
+.mapa{background:var(--card);border:1px solid var(--borde);border-radius:12px;padding:8px;margin-bottom:14px}
+.mapa img{width:100%;height:auto;display:block;border-radius:6px;cursor:zoom-in;background:#fff}
+.mapa .pie{font-size:.82rem;color:var(--sub);padding:6px 4px 2px}
+.vacio{padding:40px 10px;text-align:center;color:var(--sub)}
+section.t{margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+td{padding:6px 4px;border-top:1px solid var(--borde);vertical-align:top}
+td:first-child{white-space:nowrap;color:var(--sub);width:1%}
+.sig{color:var(--mal);font-weight:600}
+details summary{cursor:pointer;font-weight:600}
+pre{overflow-x:auto;font-size:.75rem;background:var(--bg);padding:10px;border-radius:8px;white-space:pre}
+#zoom{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;overflow:auto;z-index:10;cursor:zoom-out}
+#zoom img{display:block;width:1600px;max-width:none;margin:auto}
+@media (max-width:640px){#zoom img{width:220vw}}
+</style>
+</head>
+<body>
+<header><h1>Monitoreo de mapas de lluvia y viento</h1><p>Guerrero · Oaxaca · Chiapas — página generada el <span id="gen"></span></p></header>
+<main>
+<div class="tarjetas">
+ <div class="t"><h2>Estado del monitoreo</h2><div id="estado"></div><div class="s" id="estado_s"></div></div>
+ <div class="t"><h2>Última imagen</h2><div class="v" id="img_t"></div><div class="s" id="img_m"></div></div>
+ <div class="t"><h2>Siguiente imagen</h2><div class="v" id="sig_t"></div><div class="s" id="sig_s"></div></div>
+ <div class="t"><h2>Sistemas en la jurisdicción</h2><ul class="sis" id="sistemas"></ul></div>
+</div>
+<div class="pest"><button id="b_lluvia" class="act">Lluvia</button><button id="b_viento">Viento</button></div>
+<div class="mapa" id="mapa"></div>
+<section class="t"><h2>Últimas imágenes generadas</h2><table id="hist"></table></section>
+<section class="t" id="sec_log"><details><summary>Registro (últimas líneas)</summary><pre id="log"></pre></details></section>
+</main>
+<div id="zoom"><img alt=""></div>
+<script id="datos" type="application/json">{"generado": "2026-10-20T17:07:03.702147", "ultima_revision": "2026-10-20T17:07:03.683984", "decision": "sin cambios", "ultima_imagen": "2026-10-20T16:00:32.724237", "motivo_imagen": "", "pendientes": [], "intervalo_h": 3, "resumen": {"ciclones": {}, "zonas": [{"lat": 10.2, "lon": -100.3, "p2": 90, "p7": 90}]}, "historial": [], "imagenes": {"lluvia": {"src": "lluvia.jpg?v=202610201600", "fecha": "2026-10-20T16:00:26.377316"}, "viento": {"src": "viento.jpg?v=202610201600", "fecha": "2026-10-20T16:00:31.069730"}}, "log": [], "umbral_av": 50, "umbral_mal": 110}</script>
+<script>
+const D = JSON.parse(document.getElementById("datos").textContent);
+const $ = id => document.getElementById(id);
+const f = s => s ? new Date(s).toLocaleString("es-MX",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}) : "—";
+const hace = s => { if(!s) return null; return (Date.now()-new Date(s).getTime())/60000; };
+const txtMin = m => m < 60 ? Math.round(m)+" min" : (m/60).toFixed(1)+" h";
+$("gen").textContent = f(D.generado);
+// estado: la revisión corre cada 10 min; si pasan más de 25 min sin revisión, algo falla
+const mr = hace(D.ultima_revision);
+let cls="ok", t="En funcionamiento";
+if (mr===null || mr>D.umbral_mal){cls="mal"; t="Sin revisiones recientes";} else if (mr>D.umbral_av){cls="av"; t="Revisión retrasada";}
+$("estado").innerHTML = `<span class="est ${cls}">${t}</span>`;
+$("estado_s").textContent = mr===null ? "Aún no hay revisiones" : `Última revisión hace ${txtMin(mr)} · ${D.decision||""}`;
+$("img_t").textContent = f(D.ultima_imagen);
+$("img_m").textContent = D.motivo_imagen || "";
+if (D.pendientes && D.pendientes.length){
+  const mi = hace(D.ultima_imagen) || 0, falta = Math.max(0, D.intervalo_h*60 - mi);
+  $("sig_t").textContent = falta>0 ? `En ${txtMin(falta)}` : "En la próxima revisión";
+  $("sig_s").textContent = "Cambios menores acumulados: " + D.pendientes.join(", ");
+} else {
+  $("sig_t").textContent = "Sin cambios pendientes";
+  $("sig_s").textContent = "Se genera de inmediato si hay un cambio significativo";
+}
+const R = D.resumen || {}, ul = $("sistemas"); let n=0;
+for (const s of Object.values(R.ciclones||{})){ n++; ul.insertAdjacentHTML("beforeend",
+  `<li><span class="ciclon">● ${s.nombre}</span> · ${s.cat} · ${Math.round(s.kt)} kt (${Math.round(s.kt*1.852)} km/h)</li>`); }
+for (const z of (R.zonas||[])){ n++; ul.insertAdjacentHTML("beforeend",
+  `<li><span class="zona">▨ Zona de baja presión</span> · ${z.p2}% / ${z.p7}% (2 / 7 días) · ≈${z.lat}°N ${Math.abs(z.lon)}°O</li>`); }
+if (!n) ul.innerHTML = "<li>Sin sistemas en la jurisdicción</li>";
+function mostrar(tipo){
+  for (const k of ["lluvia","viento"]) $("b_"+k).classList.toggle("act", k===tipo);
+  const im = D.imagenes[tipo];
+  $("mapa").innerHTML = im ? `<img src="${im.src}" alt="Mapa de ${tipo}"><div class="pie">Generada: ${f(im.fecha)} · toque la imagen para ampliar</div>`
+                           : `<div class="vacio">Aún no hay mapa de ${tipo}</div>`;
+  const img = $("mapa").querySelector("img");
+  if (img) img.onclick = () => { $("zoom").querySelector("img").src = img.src; $("zoom").style.display="block"; };
+}
+$("zoom").onclick = () => $("zoom").style.display="none";
+$("b_lluvia").onclick = () => mostrar("lluvia"); $("b_viento").onclick = () => mostrar("viento");
+mostrar("lluvia");
+$("hist").innerHTML = (D.historial||[]).slice().reverse().map(h =>
+  `<tr><td>${f(h.fecha)}</td><td class="${h.motivo.startsWith("CAMBIO") ? "sig" : ""}">${h.motivo}</td></tr>`).join("")
+  || "<tr><td>—</td><td>Sin registros</td></tr>";
+if (D.log && D.log.length) $("log").textContent = D.log.join("\n"); else $("sec_log").style.display = "none";
+</script>
+</body>
+</html>
