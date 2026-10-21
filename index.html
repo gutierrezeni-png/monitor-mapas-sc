@@ -59,11 +59,10 @@ pre{overflow-x:auto;font-size:.75rem;background:var(--bg);padding:10px;border-ra
 </div>
 <div class="pest"><button id="b_lluvia" class="act">Lluvia</button><button id="b_viento">Viento</button></div>
 <div class="mapa" id="mapa"></div>
-<section class="t"><h2>Últimas imágenes generadas</h2><table id="hist"></table></section>
 <section class="t" id="sec_log"><details><summary>Registro (últimas líneas)</summary><pre id="log"></pre></details></section>
 </main>
 <div id="zoom"><img alt=""></div>
-<script id="datos" type="application/json">{"generado": "2026-10-20T17:52:21.047733", "ultima_revision": "2026-10-20T17:52:21.020479", "decision": "imágenes generadas", "ultima_imagen": "2026-10-20T17:52:21.020479", "motivo_imagen": "manual (--forzar)", "pendientes": [], "intervalo_h": 3, "resumen": {"ciclones": {}, "zonas": [{"lat": 10.2, "lon": -101.1, "p2": 90, "p7": 90}]}, "historial": [{"fecha": "2026-10-20T17:13:39.559089", "motivo": "manual (--forzar)"}, {"fecha": "2026-10-20T17:39:54.487717", "motivo": "manual (--forzar)"}, {"fecha": "2026-10-20T17:45:41.837918", "motivo": "manual (--forzar)"}, {"fecha": "2026-10-20T17:52:21.020479", "motivo": "manual (--forzar)"}], "imagenes": {"lluvia": {"src": "lluvia.jpg?v=202610201752", "fecha": "2026-10-20T17:52:17.572541"}, "viento": {"src": "viento.jpg?v=202610201752", "fecha": "2026-10-20T17:52:19.888617"}}, "log": [], "umbral_av": 50, "umbral_mal": 110}</script>
+<script id="datos" type="application/json">{"generado": "2026-10-20T18:27:04.247227", "ultima_revision": "2026-10-20T18:27:04.219536", "decision": "cambios menores en espera", "ultima_imagen": "2026-10-20T17:52:21.020479", "motivo_imagen": "manual (--forzar)", "pendientes": ["zonas"], "intervalo_h": 3, "resumen": {"ciclones": {}, "zonas": [{"lat": 10.0, "lon": -97.4, "p2": 90, "p7": 90}]}, "historial": [{"fecha": "2026-10-20T17:13:39.559089", "motivo": "manual (--forzar)"}, {"fecha": "2026-10-20T17:39:54.487717", "motivo": "manual (--forzar)"}, {"fecha": "2026-10-20T17:45:41.837918", "motivo": "manual (--forzar)"}, {"fecha": "2026-10-20T17:52:21.020479", "motivo": "manual (--forzar)"}], "imagenes": {"lluvia": {"src": "lluvia.jpg?v=202610201752", "fecha": "2026-10-20T17:52:17.572541"}, "viento": {"src": "viento.jpg?v=202610201752", "fecha": "2026-10-20T17:52:19.888617"}}, "log": [], "umbral_av": 50, "umbral_mal": 110}</script>
 <script>
 const D = JSON.parse(document.getElementById("datos").textContent);
 const $ = id => document.getElementById(id);
@@ -104,9 +103,6 @@ function mostrar(tipo){
 $("zoom").onclick = () => $("zoom").style.display="none";
 $("b_lluvia").onclick = () => mostrar("lluvia"); $("b_viento").onclick = () => mostrar("viento");
 mostrar("lluvia");
-$("hist").innerHTML = (D.historial||[]).slice().reverse().map(h =>
-  `<tr><td>${f(h.fecha)}</td><td class="${h.motivo.startsWith("CAMBIO") ? "sig" : ""}">${h.motivo}</td></tr>`).join("")
-  || "<tr><td>—</td><td>Sin registros</td></tr>";
 if (D.log && D.log.length) $("log").textContent = D.log.join("\n"); else $("sec_log").style.display = "none";
 </script>
 </body>
